@@ -17,7 +17,11 @@ public class Board {
         }
     }
 
-    public void makeEntry(int row, int col, Symbol symbol) {
+    public void makeEntry(int row, int col, Symbol symbol) throws CellOccupiedException {
+        if(this.boardGrid[row][col] != Symbol.EMPTY) {
+            throw new CellOccupiedException("Cell is already occupied!!!");
+        }
+
         this.boardGrid[row][col] = symbol;
     }
 

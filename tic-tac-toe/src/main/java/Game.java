@@ -72,10 +72,19 @@ public class Game {
 
         while(status == GameStatus.IN_PROGRESS) {
             System.out.println(turnToPlay.getName() + "'s turn");
-            int row = getCellInput("row");
-            int col = getCellInput("col");
+            boolean isEntryValid = false;
 
-            board.makeEntry(row, col, turnToPlay.getSymbol());
+            while(!isEntryValid) {
+                int row = getCellInput("row");
+                int col = getCellInput("col");
+                try {
+                    board.makeEntry(row, col, turnToPlay.getSymbol());
+                    isEntryValid = true;
+                } catch (CellOccupiedException exception) {
+                    System.out.println(exception.getMessage());
+                }
+            }
+
             board.printBoard();
 
             Symbol winnerSymbol = board.getWinnerSymbol();
