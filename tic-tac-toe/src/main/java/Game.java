@@ -7,7 +7,7 @@ public class Game {
     private Player turnToPlay;
     private GameStatus status;
     private Player winner;
-    private Scanner scanner;
+    private final Scanner scanner;
 
     public Game(Scanner scanner) {
         this.scanner = scanner;
@@ -52,13 +52,13 @@ public class Game {
             }
         }
 
-        this.player1 = new Player(name1, player1Symbol);
+        player1 = new Player(name1, player1Symbol);
 
         System.out.println("Enter player 2 name: ");
         String name2 = scanner.nextLine();
 
         Symbol player2Symbol = (player1Symbol.equals(Symbol.X) ? Symbol.O : Symbol.X);
-        this.player2 = new Player(name2, player2Symbol);
+        player2 = new Player(name2, player2Symbol);
 
         System.out.println(player1.getName() + " plays " + player1Symbol.toString());
         System.out.println(player2.getName() + " plays " + player2Symbol.toString());
@@ -72,32 +72,8 @@ public class Game {
 
         while(status == GameStatus.IN_PROGRESS) {
             System.out.println(turnToPlay.getName() + "'s turn");
-            int row = -1;
-            int col = -1;
-
-            while(true) {
-                System.out.println("Enter row number: ");
-                row = scanner.nextInt();
-                scanner.nextLine();
-
-                if(row < 0 || row >= this.board.getSize()) {
-                    System.out.println("Invalid row value..");
-                    continue;
-                }
-                break;
-            }
-
-            while(true) {
-                System.out.println("Enter col number: ");
-                col = scanner.nextInt();
-                scanner.nextLine();
-
-                if(col < 0 || col >= this.board.getSize()) {
-                    System.out.println("Invalid col value..");
-                    continue;
-                }
-                break;
-            }
+            int row = getCellInput("row");
+            int col = getCellInput("col");
 
             board.makeEntry(row, col, turnToPlay.getSymbol());
             board.printBoard();
@@ -106,9 +82,9 @@ public class Game {
 
             if(winnerSymbol != Symbol.EMPTY) {
                 Player gameWinner = (player1.getSymbol() == winnerSymbol) ? player1 : player2;
-                System.out.println(gameWinner.getName() + " wins!!!");
                 this.winner = gameWinner;
                 status = GameStatus.WON;
+                System.out.println(gameWinner.getName() + " wins!!!");
             } else if(board.isFull()) {
                 status = GameStatus.DRAW;
                 System.out.println("It's a draw!!!");
@@ -116,5 +92,22 @@ public class Game {
 
             turnToPlay = (turnToPlay.equals(player1) ? player2 : player1);
         }
+    }
+
+    private int getCellInput(String cellParam) {
+        int cellValue = -1;
+
+        while(true) {
+            System.out.println("Enter " + cellParam + " number: ");
+            cellValue = scanner.nextInt();
+            scanner.nextLine();
+
+            if(cellValue < 0 || cellValue >= this.board.getSize()) {
+                System.out.println("Invalid " + cellParam + " value..");
+                continue;
+            }
+            break;
+        }
+        return cellValue;
     }
 }
