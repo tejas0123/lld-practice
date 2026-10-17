@@ -1,6 +1,6 @@
 public class Player {
-    private String name;
-    private Symbol symbol;
+    private final String name;
+    private final Symbol symbol;
 
     public String getName() {
         return name;
