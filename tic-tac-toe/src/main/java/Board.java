@@ -1,6 +1,6 @@
 public class Board {
-    private int size;
-    private Symbol[][] boardGrid;
+    private final int size;
+    private final Symbol[][] boardGrid;
 
     public int getSize() {
         return this.size;
@@ -17,12 +17,40 @@ public class Board {
         }
     }
 
-    public void makeEntry(int row, int col, Symbol symbol) throws CellOccupiedException {
+    public void placeSymbol(int row, int col, Symbol symbol) throws CellOccupiedException {
+        if(row < 0 || row >= size || col < 0 || col >= size) {
+            throw new ArrayIndexOutOfBoundsException("Row / Col is out of bounds!");
+        }
+
         if(this.boardGrid[row][col] != Symbol.EMPTY) {
             throw new CellOccupiedException("Cell is already occupied!!!");
         }
 
         this.boardGrid[row][col] = symbol;
+    }
+
+    public boolean isFull() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (boardGrid[i][j] == Symbol.EMPTY) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        String sep = "-".repeat(size * 4 + 1);
+        StringBuilder sb = new StringBuilder(sep).append('\n');
+        for (Symbol[] row : boardGrid) {
+            for (Symbol cell : row) {
+                sb.append("| ").append(cell == Symbol.EMPTY ? " " : cell.toString()).append(' ');
+            }
+            sb.append("|\n").append(sep).append('\n');
+        }
+        return sb.toString();
     }
 
     public Symbol getWinnerSymbol() {
@@ -85,35 +113,5 @@ public class Board {
         }
 
         return Symbol.EMPTY;
-    }
-
-    public boolean isFull() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (boardGrid[i][j] == Symbol.EMPTY) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public void printBoard() {
-        System.out.println();
-        System.out.println("----------------------------");
-        for(int i = 0; i < size; i++) {
-            for(int j = 0; j < size; j++) {
-                if(boardGrid[i][j] == Symbol.EMPTY) {
-                    System.out.print("|  ");
-                } else {
-                    System.out.print("| " + boardGrid[i][j].toString() + " ");
-                }
-                if(j == size - 1) {
-                    System.out.print("|");
-                }
-            }
-            System.out.println();
-            System.out.println("----------------------------");
-        }
     }
 }

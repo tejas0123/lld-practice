@@ -3,5 +3,4 @@ public enum GameStatus {
     WON,
     DRAW,
     READY,
-    NOT_STARTED
 }

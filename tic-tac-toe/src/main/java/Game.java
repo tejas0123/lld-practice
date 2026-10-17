@@ -1,4 +1,4 @@
-import java.util.Scanner;
+import java.util.Optional;
 
 public class Game {
     private Board board;
@@ -7,67 +7,53 @@ public class Game {
     private Player turnToPlay;
     private GameStatus status;
     private Player winner;
-    private final Scanner scanner;
 
-    public Game(Scanner scanner) {
-        this.scanner = scanner;
-        this.status = GameStatus.NOT_STARTED;
-        this.board = null;
+    public Game(Board gameBoard, Player player1, Player player2) {
+        this.board = gameBoard;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.turnToPlay = player1;
+        this.status = GameStatus.READY;
+        this.winner = null;
     }
 
-    public Boolean isGameInitialized() {
-        return this.status.equals(GameStatus.READY);
+    public Optional<Player> getWinner() {
+        return Optional.ofNullable(this.winner);
     }
 
-    public void initGame() {
-        System.out.println("Enter board size: ");
-        int size = 0;
+    public Player getCurrentTurn() {
+        return this.turnToPlay;
+    }
 
-        while (this.board == null) {
-            size = scanner.nextInt();
-            scanner.nextLine();
+    public GameStatus makeMove(int row, int col) throws CellOccupiedException, ArrayIndexOutOfBoundsException {
+        board.placeSymbol(row, col, this.turnToPlay.getSymbol());
+        Symbol winnerSymbol = board.getWinnerSymbol();
 
-            if (size < 3 || size > 5) {
-                System.out.println("Invalid size. Choose between 3, 4 and 5");
-                continue;
-            }
-            this.board = new Board(size);
+        if(winnerSymbol != Symbol.EMPTY) {
+            this.winner = this.turnToPlay;
+            this.status = GameStatus.WON;
+            return this.status;
         }
 
-        System.out.println("Enter player 1 name: ");
-        String name1 = scanner.nextLine();
-
-        System.out.println("Choose player 1 symbol: X / O");
-        Symbol player1Symbol = Symbol.EMPTY;
-
-        while (player1Symbol == Symbol.EMPTY) {
-            String symbol = scanner.nextLine().trim();
-
-            if (symbol.equalsIgnoreCase("X")) {
-                player1Symbol = Symbol.X;
-            } else if (symbol.equalsIgnoreCase("O")) {
-                player1Symbol = Symbol.O;
-            } else {
-                System.out.println("Invalid symbol entered. Choose X or O.");
-            }
+        if(board.isFull()) {
+            this.status = GameStatus.DRAW;
+            return this.status;
         }
 
-        player1 = new Player(name1, player1Symbol);
+        swapTurns();
 
-        System.out.println("Enter player 2 name: ");
-        String name2 = scanner.nextLine();
-
-        Symbol player2Symbol = (player1Symbol.equals(Symbol.X) ? Symbol.O : Symbol.X);
-        player2 = new Player(name2, player2Symbol);
-
-        System.out.println(player1.getName() + " plays " + player1Symbol.toString());
-        System.out.println(player2.getName() + " plays " + player2Symbol.toString());
-        turnToPlay = player1;
-        winner = null;
-        status = GameStatus.READY;
+        return GameStatus.IN_PROGRESS;
     }
 
-    public void play() {
+    private void swapTurns() {
+        this.turnToPlay = (turnToPlay.equals(player1)) ? player2 : player1;
+    }
+
+    public void showBoard(GameIO gameIO) {
+        gameIO.print(board.toString());
+    }
+
+    /*public void play() {
         this.status = GameStatus.IN_PROGRESS;
 
         while(status == GameStatus.IN_PROGRESS) {
@@ -75,10 +61,10 @@ public class Game {
             boolean isEntryValid = false;
 
             while(!isEntryValid) {
-                int row = getCellInput("row");
+                int row = ("row");
                 int col = getCellInput("col");
                 try {
-                    board.makeEntry(row, col, turnToPlay.getSymbol());
+                    board.placeSymbol(row, col, turnToPlay.getSymbol());
                     isEntryValid = true;
                 } catch (CellOccupiedException exception) {
                     System.out.println(exception.getMessage());
@@ -101,22 +87,5 @@ public class Game {
 
             turnToPlay = (turnToPlay.equals(player1) ? player2 : player1);
         }
-    }
-
-    private int getCellInput(String cellParam) {
-        int cellValue = -1;
-
-        while(true) {
-            System.out.println("Enter " + cellParam + " number: ");
-            cellValue = scanner.nextInt();
-            scanner.nextLine();
-
-            if(cellValue < 0 || cellValue >= this.board.getSize()) {
-                System.out.println("Invalid " + cellParam + " value..");
-                continue;
-            }
-            break;
-        }
-        return cellValue;
-    }
+    }*/
 }
